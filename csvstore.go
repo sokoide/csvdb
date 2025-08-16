@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"strings"
 )
 
 type Record map[string]string // filele name -> value
@@ -25,7 +26,10 @@ func NewCSVStoreFromReader(r io.Reader) (*CSVStore, error) {
 		return nil, fmt.Errorf("empty CSV")
 	}
 
-	headers := rows[0]
+	headers := make([]string, len(rows[0]))
+	for i, h := range rows[0] {
+		headers[i] = strings.TrimSpace(h)
+	}
 	indices := make(map[string]map[string]Record)
 	for _, h := range headers {
 		indices[h] = make(map[string]Record)
@@ -35,7 +39,7 @@ func NewCSVStoreFromReader(r io.Reader) (*CSVStore, error) {
 		rec := make(Record)
 		for i, val := range row {
 			if i < len(headers) {
-				rec[headers[i]] = val
+				rec[headers[i]] = strings.TrimSpace(val)
 			}
 		}
 		for _, h := range headers {
